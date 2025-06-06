@@ -1,7 +1,8 @@
-﻿@model Healy.Models.HealthMetricViewModel
+﻿@model Healy.Models.CombinedHealthMetricViewModel
 
 @{
     ViewData["Title"] = "Home";
+    string selectedPeriod = Context.Request.Query["period"].FirstOrDefault()?.ToLower() ?? "daily";
 }
 
 <div class="container">
@@ -18,13 +19,16 @@
         <div class="col-12">
             <ul class="nav nav-pills">
                 <li class="nav-item">
-                    <a class="nav-link active bg-primary" href="#" style="border-radius: 25px; padding: 6px 16px; font-size: 0.9rem;">Daily</a>
+                    <a class="nav-link @(selectedPeriod == "daily" ? "active bg-primary" : "text-dark")"
+                       href="?period=daily" style="border-radius: 25px; padding: 6px 16px; font-size: 0.9rem;">Daily</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="#" style="border-radius: 25px; padding: 6px 16px; font-size: 0.9rem;">Weekly</a>
+                    <a class="nav-link @(selectedPeriod == "weekly" ? "active bg-primary" : "text-dark")"
+                       href="?period=weekly" style="border-radius: 25px; padding: 6px 16px; font-size: 0.9rem;">Weekly</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="#" style="border-radius: 25px; padding: 6px 16px; font-size: 0.9rem;">Monthly</a>
+                    <a class="nav-link @(selectedPeriod == "monthly" ? "active bg-primary" : "text-dark")"
+                       href="?period=monthly" style="border-radius: 25px; padding: 6px 16px; font-size: 0.9rem;">Monthly</a>
                 </li>
             </ul>
         </div>
@@ -32,6 +36,15 @@
 
     <!-- Metrics Cards -->
     <div class="row g-3 mb-4">
+        @{
+            var currentMetrics = selectedPeriod switch
+            {
+                "weekly" => Model.Weekly,
+                "monthly" => Model.Monthly,
+                _ => Model.Daily
+            };
+        }
+
         <!-- Heart Rate Card (Full Width) -->
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #e74c3c, #c0392b); border-radius: 20px; height: 150px;">
@@ -39,11 +52,11 @@
                     <div>
                         <h6 class="card-title opacity-75 mb-1" style="font-size: 0.8rem;">Heart Rate</h6>
                         <p class="small opacity-75 mb-1" style="font-size: 0.7rem;">Current</p>
-                        <h2 class="fw-bold mb-0" style="font-size: 2rem;">@Model.HeartRate<small class="fw-normal" style="font-size: 1rem;">BPM</small></h2>
+                        <h2 class="fw-bold mb-0" style="font-size: 2rem;">@currentMetrics.HeartRate<small class="fw-normal" style="font-size: 1rem;">BPM</small></h2>
                     </div>
                     <div>
                         <svg width="24" height="24" fill="currentColor" class="opacity-75" viewBox="0 0 16 16">
-                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
                         </svg>
                     </div>
                 </div>
@@ -55,7 +68,7 @@
             <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #3498db, #2980b9); border-radius: 20px; height: 120px;">
                 <div class="card-body text-white">
                     <h6 class="card-title opacity-75 mb-2" style="font-size: 0.8rem;">Sleep</h6>
-                    <h2 class="fw-bold mb-0" style="font-size: 1.8rem;">7.2 <small class="fw-normal" style="font-size: 0.9rem;">hrs</small></h2>
+                    <h2 class="fw-bold mb-0" style="font-size: 1.8rem;">@currentMetrics.Sleep<small class="fw-normal" style="font-size: 0.9rem;">hrs</small></h2>
                 </div>
             </div>
         </div>
@@ -64,7 +77,7 @@
             <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #5dade2, #3498db); border-radius: 20px; height: 120px;">
                 <div class="card-body text-white">
                     <h6 class="card-title opacity-75 mb-2" style="font-size: 0.8rem;">Blood O₂</h6>
-                    <h2 class="fw-bold mb-0" style="font-size: 1.8rem;">98 <small class="fw-normal" style="font-size: 0.9rem;">%</small></h2>
+                    <h2 class="fw-bold mb-0" style="font-size: 1.8rem;">@currentMetrics.BloodOxygen<small class="fw-normal" style="font-size: 0.9rem;">%</small></h2>
                 </div>
             </div>
         </div>
@@ -76,8 +89,8 @@
                     <div class="d-flex justify-content-between align-items-start mb-1">
                         <h6 class="card-title opacity-75 mb-0" style="font-size: 0.8rem;">Steps</h6>
                     </div>
-                    <p class="small opacity-75 mb-1" style="font-size: 0.7rem;">78.6% of goal</p>
-                    <h2 class="fw-bold mb-0" style="font-size: 1.5rem;">7,865</h2>
+                    <p class="small opacity-75 mb-1" style="font-size: 0.7rem;">&nbsp;</p>
+                    <h2 class="fw-bold mb-0" style="font-size: 1.5rem;">@currentMetrics.Steps</h2>
                 </div>
             </div>
         </div>
@@ -86,8 +99,8 @@
             <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f39c12, #e67e22); border-radius: 20px; height: 120px;">
                 <div class="card-body text-white">
                     <h6 class="card-title opacity-75 mb-1" style="font-size: 0.8rem;">Calories</h6>
-                    <p class="small opacity-75 mb-1" style="font-size: 0.7rem;">74% of goal</p>
-                    <h2 class="fw-bold mb-0" style="font-size: 1.5rem;">1,850</h2>
+                    <p class="small opacity-75 mb-1" style="font-size: 0.7rem;">&nbsp;</p>
+                    <h2 class="fw-bold mb-0" style="font-size: 1.5rem;">@currentMetrics.Calories</h2>
                 </div>
             </div>
         </div>
@@ -97,7 +110,7 @@
             <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #85c1e9, #5dade2); border-radius: 20px; height: 120px;">
                 <div class="card-body text-white">
                     <h6 class="card-title opacity-75 mb-2" style="font-size: 0.8rem;">Water</h6>
-                    <h2 class="fw-bold mb-0" style="font-size: 1.8rem;">1.8 <small class="fw-normal" style="font-size: 0.9rem;">L</small></h2>
+                    <h2 class="fw-bold mb-0" style="font-size: 1.8rem;">@currentMetrics.Water<small class="fw-normal" style="font-size: 0.9rem;">L</small></h2>
                 </div>
             </div>
         </div>
@@ -107,7 +120,7 @@
                 <div class="card-body text-white">
                     <h6 class="card-title opacity-75 mb-1" style="font-size: 0.8rem;">Stress</h6>
                     <p class="small opacity-75 mb-1" style="font-size: 0.7rem;">moderate</p>
-                    <h2 class="fw-bold mb-0" style="font-size: 1.5rem;">65</h2>
+                    <h2 class="fw-bold mb-0" style="font-size: 1.5rem;">@currentMetrics.Stress</h2>
                 </div>
             </div>
         </div>
@@ -118,69 +131,47 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
                 <div class="card-body p-3">
-                    <h5 class="fw-bold text-dark mb-1" style="font-size: 1rem;">Daily Trends</h5>
-                    <p class="text-muted mb-3" style="font-size: 0.8rem;">Your heart rate data over time</p>
-                    
+                    <h5 class="fw-bold text-dark mb-1" style="font-size: 1rem;">
+                        @(char.ToUpper(selectedPeriod[0]) + selectedPeriod.Substring(1)) Trends
+                    </h5>
+                    <p class="text-muted mb-3" style="font-size: 0.8rem;">Your health data over time</p>
+
                     <!-- Chart Container -->
                     <div class="chart-container mb-3" style="height: 180px; position: relative;">
-                        <canvas id="heartRateChart" style="max-height: 180px;"></canvas>
-                    </div>
-
-                    <!-- Stats Row -->
-                    <div class="row text-center">
-                        <div class="col-3">
-                            <p class="text-muted small mb-0" style="font-size: 0.7rem;">Heart Rate</p>
-                            <p class="fw-bold text-danger mb-0" style="font-size: 0.9rem;">72 BPM</p>
-                        </div>
-                        <div class="col-3">
-                            <p class="text-muted small mb-0" style="font-size: 0.7rem;">Steps</p>
-                            <p class="fw-bold text-dark mb-0" style="font-size: 0.9rem;">72</p>
-                        </div>
-                        <div class="col-3">
-                            <p class="text-muted small mb-0" style="font-size: 0.7rem;">Calories</p>
-                            <p class="fw-bold text-dark mb-0" style="font-size: 0.9rem;">72</p>
-                        </div>
-                        <div class="col-3">
-                            <p class="text-muted small mb-0" style="font-size: 0.7rem;">Sleep</p>
-                            <p class="fw-bold text-dark mb-0" style="font-size: 0.9rem;">7.1</p>
-                        </div>
+                        <canvas id="healthChart" style="max-height: 180px;"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-    </div>  
-
-    <!-- More Information Section -->
-    @* <div class="row">
-        <div class="col-12">
-            <h5 class="fw-bold text-dark mb-2" style="font-size: 1rem;">More Information</h5>
-            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #d6eaf8, #85c1e9); border-radius: 20px; height: 60px;">
-                <div class="card-body d-flex justify-content-center align-items-center">
-                    <svg width="24" height="24" fill="currentColor" class="text-primary" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </div> *@
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Simple chart implementation
     document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('heartRateChart').getContext('2d');
+        const ctx = document.getElementById('healthChart').getContext('2d');
         new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6'],
                 datasets: [{
+                    label: 'Heart Rate',
                     data: [75, 80, 70, 78, 72, 82],
                     borderColor: '#e74c3c',
                     backgroundColor: 'rgba(231, 76, 60, 0.1)',
                     tension: 0.4,
                     pointRadius: 3,
                     pointBackgroundColor: '#e74c3c',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Steps',
+                    data: [4000, 8000, 6000, 7000, 5000, 9000],
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#27ae60',
                     borderWidth: 2
                 }]
             },
@@ -189,7 +180,8 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false
+                        display: true,
+                        position: 'bottom'
                     }
                 },
                 scales: {
@@ -197,16 +189,10 @@
                         beginAtZero: false,
                         grid: {
                             display: false
-                        },
-                        ticks: {
-                            display: false
                         }
                     },
                     x: {
                         grid: {
-                            display: false
-                        },
-                        ticks: {
                             display: false
                         }
                     }
