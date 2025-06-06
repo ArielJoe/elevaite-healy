@@ -1,4 +1,8 @@
+using Azure;
+using Azure.AI.OpenAI;
+using OpenAI.Chat;
 using Serilog;
+using Healy.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +17,23 @@ builder.Host.UseSerilog();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<Healy.Services.BlobService>();
+
+builder.Services.Configure<AzureOpenAIModel>(builder.Configuration.GetSection("AzureOpenAI"));
+
+builder.Services.AddSingleton<AzureOpenAIClient>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>().GetSection("AzureOpenAI").Get<AzureOpenAIModel>();
+    return new AzureOpenAIClient(
+        new Uri(config.Endpoint!),
+        new AzureKeyCredential(config.ApiKey!));
+});
+
+builder.Services.AddSingleton<ChatClient>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>().GetSection("AzureOpenAI").Get<AzureOpenAIModel>();
+    var azureClient = sp.GetRequiredService<AzureOpenAIClient>();
+    return azureClient.GetChatClient(config.DeploymentName!);
+});
 
 var app = builder.Build();
 

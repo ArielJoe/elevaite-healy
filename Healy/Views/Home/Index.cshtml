@@ -127,18 +127,36 @@
     </div>
 
     <!-- Daily Trends Section -->
-    <div class="row mb-4">
-        <div class="col-12">
+    <div class="row">
+        <!-- Heart Rate Trend -->
+        <div class="col-md-6 mb-3 mb-md-0">
             <div class="card border-0 shadow-sm" style="border-radius: 20px;">
                 <div class="card-body p-3">
                     <h5 class="fw-bold text-dark mb-1" style="font-size: 1rem;">
-                        @(char.ToUpper(selectedPeriod[0]) + selectedPeriod.Substring(1)) Trends
+                        @(char.ToUpper(selectedPeriod[0]) + selectedPeriod.Substring(1)) Heart Rate
                     </h5>
-                    <p class="text-muted mb-3" style="font-size: 0.8rem;">Your health data over time</p>
+                    <p class="text-muted mb-3" style="font-size: 0.8rem;">Your heart rate over time</p>
 
                     <!-- Chart Container -->
                     <div class="chart-container mb-3" style="height: 180px; position: relative;">
-                        <canvas id="healthChart" style="max-height: 180px;"></canvas>
+                        <canvas id="heartRateChart" style="max-height: 180px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Steps Trend -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+                <div class="card-body p-3">
+                    <h5 class="fw-bold text-dark mb-1" style="font-size: 1rem;">
+                        @(char.ToUpper(selectedPeriod[0]) + selectedPeriod.Substring(1)) Steps
+                    </h5>
+                    <p class="text-muted mb-3" style="font-size: 0.8rem;">Your daily step count</p>
+
+                    <!-- Chart Container -->
+                    <div class="chart-container mb-3" style="height: 180px; position: relative;">
+                        <canvas id="stepsChart" style="max-height: 180px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -149,30 +167,22 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('healthChart').getContext('2d');
-        new Chart(ctx, {
+        // Heart Rate Chart
+        const heartRateCtx = document.getElementById('heartRateChart').getContext('2d');
+        new Chart(heartRateCtx, {
             type: 'line',
             data: {
                 labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6'],
                 datasets: [{
-                    label: 'Heart Rate',
+                    label: 'Heart Rate (BPM)',
                     data: [75, 80, 70, 78, 72, 82],
                     borderColor: '#e74c3c',
                     backgroundColor: 'rgba(231, 76, 60, 0.1)',
                     tension: 0.4,
                     pointRadius: 3,
                     pointBackgroundColor: '#e74c3c',
-                    borderWidth: 2
-                },
-                {
-                    label: 'Steps',
-                    data: [4000, 8000, 6000, 7000, 5000, 9000],
-                    borderColor: '#27ae60',
-                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
-                    tension: 0.4,
-                    pointRadius: 3,
-                    pointBackgroundColor: '#27ae60',
-                    borderWidth: 2
+                    borderWidth: 2,
+                    fill: true
                 }]
             },
             options: {
@@ -187,6 +197,49 @@
                 scales: {
                     y: {
                         beginAtZero: false,
+                        grid: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Steps Chart
+        const stepsCtx = document.getElementById('stepsChart').getContext('2d');
+        new Chart(stepsCtx, {
+            type: 'line',
+            data: {
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6'],
+                datasets: [{
+                    label: 'Steps',
+                    data: [4000, 8000, 6000, 7000, 5000, 9000],
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#27ae60',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
                         grid: {
                             display: false
                         }

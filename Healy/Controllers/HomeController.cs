@@ -150,6 +150,14 @@ namespace Healy.Controllers
 
         public IActionResult Insights()
         {
+            ViewBag.InsightsData = new
+            {
+                SleepQuality = new { Title = "Sleep Quality Declining", Time = "06:07 AM", Description = "Your deep sleep has decreased by 20% over the past week, which may affect your recovery and cognitive function.", Recommendation = "Try to maintain a consistent sleep schedule and avoid screens 1 hour before bedtime." },
+                ActivityPattern = new { Title = "Activity Pattern Change", Time = "06:07 AM", Description = "You've been less active on weekdays compared to your previous month's average.", Recommendation = "Consider scheduling short walks during your work breaks to increase daily activity." },
+                HydrationImprovement = new { Title = "Hydration Improvement", Time = "06:07 AM", Description = "Your hydration consistency has improved by 25% this week.", Recommendation = "Keep using timed water reminders to maintain this positive habit." },
+                StressLevels = new { Title = "Elevated Stress Levels", Time = "10:07 AM", Description = "Your stress levels have been consistently higher than normal for the past 3 days.", Recommendation = "Try the guided breathing exercises in the app for 5 minutes, 3 times daily." },
+                WeeklySummary = new { Title = "Your Weekly Health Summary", Description = "Based on your data from this week, your overall health indicators are showing positive trends. Your sleep quality has improved by 15%, and your heart rate variability indicates good recovery. Keep maintaining your evening meditation routine and consistent sleep schedule.", Changes = new[] { new { Category = "Sleep Quality", Change = "+15%" }, new { Category = "Stress Level", Change = "-8%" }, new { Category = "Activity", Change = "+12%" } } }
+            };
             return View();
         }
 
