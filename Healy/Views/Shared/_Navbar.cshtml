@@ -1,0 +1,38 @@
+﻿@{
+    var currentPath = Context.Request.Path.Value;
+}
+
+<nav class="navbar fixed-bottom navbar-light bg-white border-top shadow-sm d-block">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-around w-100">
+            <!-- Metrics Tab -->
+            <a href="/" class="text-center py-2 nav-link @(currentPath == "/" ? "active" : "")">
+                <div class="d-flex flex-column align-items-center">
+                    <i class="bi bi-speedometer2 fs-5"></i>
+                    <span class="small">Metrics</span>
+                </div>
+            </a>
+            <!-- Activities Tab -->
+            <a href="/activities" class="text-center py-2 nav-link @(currentPath == "/activities" ? "active" : "")">
+                <div class="d-flex flex-column align-items-center">
+                    <i class="bi bi-activity fs-5"></i>
+                    <span class="small">Activities</span>
+                </div>
+            </a>
+            <!-- Insights Tab -->
+            <a href="/insights" class="text-center py-2 nav-link @(currentPath == "/insights" ? "active" : "")">
+                <div class="d-flex flex-column align-items-center">
+                    <i class="bi bi-graph-up fs-5"></i>
+                    <span class="small">Insights</span>
+                </div>
+            </a>
+            <!-- Profile Tab -->
+            <a href="/profile" class="text-center py-2 nav-link @(currentPath == "/profile" ? "active" : "")">
+                <div class="d-flex flex-column align-items-center">
+                    <i class="bi bi-person fs-5"></i>
+                    <span class="small">Profile</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</nav>

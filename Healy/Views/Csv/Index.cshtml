@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Healy.Models.CsvRecordViewModel>
+
+<h2>CSV Data</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Uid</th>
+            <th>Sid</th>
+            <th>Key</th>
+            <th>Time</th>
+            <th>Value</th>
+            <th>UpdateTime</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model)
+        {
+            <tr>
+                <td>@row.Uid</td>
+                <td>@row.Sid</td>
+                <td>@row.Key</td>
+                <td>@row.Time</td>
+                <td>@row.Value</td>
+                <td>@row.UpdateTime</td>
+            </tr>
+        }
+    </tbody>
+</table>
