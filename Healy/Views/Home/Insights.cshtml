@@ -4,6 +4,8 @@
 @{
     ViewData["Title"] = "Insights";
     var insightsList = ViewBag.InsightsDataList as List<InsightsData> ?? new List<InsightsData>();
+    var paginationInfo = ViewBag.PaginationInfo as PaginationInfo;
+    var email = ViewBag.Email as string;
 }
 
 @section Styles {
@@ -16,22 +18,22 @@
             background-color: #fff;
         }
 
-            .insight-card h5 {
-                margin-bottom: 10px;
-                font-size: 1.1rem;
-            }
+        .insight-card h5 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
 
-            .insight-card p {
-                margin-bottom: 5px;
-                color: #666;
-            }
+        .insight-card p {
+            margin-bottom: 5px;
+            color: #666;
+        }
 
-            .insight-card .recommendation {
-                background-color: #f8f9fa;
-                padding: 10px;
-                border-radius: 5px;
-                margin-top: 10px;
-            }
+        .insight-card .recommendation {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
 
         .insight-icon {
             font-size: 1.5rem;
@@ -61,12 +63,131 @@
         .cyan-card {
             border-left: 5px solid #17a2b8;
         }
+
+        /* Loading Spinner Styles */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            display: inline-block;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-container {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .loading-container.active {
+            display: flex;
+        }
+
+        /* Pagination Styles */
+        .pagination-container {
+            margin: 30px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .pagination-info {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            margin: 0;
+        }
+
+        .page-link {
+            color: #007bff;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            margin: 0 2px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .page-link:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+            color: #0056b3;
+        }
+
+        .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            background-color: #fff;
+            border-color: #dee2e6;
+            cursor: not-allowed;
+        }
+
+        .insights-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .insights-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
     </style>
 }
 
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            const loadingContainer = document.querySelector('.loading-container');
+
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    loadingContainer.classList.add('active');
+                });
+            }
+        });
+    </script>
+}
+
 <div class="container mt-4">
-    <h2>AI Insights</h2>
-    <p class="text-muted">Your personalized health intelligence</p>
+    <div class="insights-header">
+        <div>
+            <h2>AI Insights</h2>
+            <p class="text-muted">Your personalized health intelligence</p>
+        </div>
+        @if (paginationInfo != null && paginationInfo.TotalItems > 0)
+        {
+            <div class="insights-count">
+                Total Insights: @paginationInfo.TotalItems
+            </div>
+        }
+    </div>
     <hr />
 
     @if (insightsList.Any())
@@ -176,6 +297,73 @@
             }
         }
 
+        <!-- Pagination Controls -->
+        @if (paginationInfo != null && paginationInfo.TotalPages > 1)
+        {
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Showing @((paginationInfo.CurrentPage - 1) * paginationInfo.PageSize + 1) to
+                    @(Math.Min(paginationInfo.CurrentPage * paginationInfo.PageSize, paginationInfo.TotalItems))
+                    of @paginationInfo.TotalItems insights
+                </div>
+
+                <ul class="pagination" style="display: flex; gap: 10px;">
+                    <!-- Previous Button -->
+                    <li class="page-item @(!paginationInfo.HasPreviousPage ? "disabled" : "")">
+                        <a class="page-link" href="@(paginationInfo.HasPreviousPage? Url.Action("Index", new { email = email, page = paginationInfo.CurrentPage - 1 }) : "#")" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    @{
+                        int startPage = Math.Max(1, paginationInfo.CurrentPage - 2);
+                        int endPage = Math.Min(paginationInfo.TotalPages, paginationInfo.CurrentPage + 2);
+                    }
+
+                    @if (startPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Index", new { email = email, page = 1 })">1</a>
+                        </li>
+                        @if (startPage > 2)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+                    }
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == paginationInfo.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { email = email, page = i })">@i</a>
+                        </li>
+                    }
+
+                    @if (endPage < paginationInfo.TotalPages)
+                    {
+                        @if (endPage < paginationInfo.TotalPages - 1)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Index", new { email = email, page = paginationInfo.TotalPages })">@paginationInfo.TotalPages</a>
+                        </li>
+                    }
+
+                    <!-- Next Button -->
+                    <li class="page-item @(!paginationInfo.HasNextPage ? "disabled" : "")">
+                        <a class="page-link" href="@(paginationInfo.HasNextPage? Url.Action("Index", new { email = email, page = paginationInfo.CurrentPage + 1 }) : "#")" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        }
+
         <!-- Show message if no insights were generated -->
         @if (!insightsList.Any() || insightsList.All(data => data.HeartRate == null && data.Sleep == null && data.BloodO2 == null && data.Steps == null && data.Calories == null && data.Stress == null))
         {
@@ -192,6 +380,11 @@
             No insights data available. Click the button below to generate personalized insights from your wearable data.
         </div>
     }
+
+    <div class="loading-container" role="status">
+        <span>Generating insights...</span>
+        <div class="loader"></div>
+    </div>
 
     <form method="post" asp-action="GenerateInsights">
         <input type="hidden" name="email" value="@Model.Email" />

@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 public class InsightsController : Controller
 {
     private readonly IUserService _userService;
     private readonly IAiAnalysisService _aiAnalysisService;
+    private const int PageSize = 5; // Number of insights per page
 
     public InsightsController(IUserService userService, IAiAnalysisService aiAnalysisService)
     {
@@ -16,8 +18,8 @@ public class InsightsController : Controller
         _aiAnalysisService = aiAnalysisService;
     }
 
-    // GET: /Profile/{id}
-    public async Task<IActionResult> Index(string email)
+    // GET: /Insights
+    public async Task<IActionResult> Index(string email, int page = 1)
     {
         var user = await _userService.GetUserByEmailAsync("ariel.crb01@gmail.com");
         if (user == null)
@@ -26,7 +28,7 @@ public class InsightsController : Controller
         }
 
         // Deserialize all insights from user.Insights
-        var insightsList = new List<InsightsData>();
+        var allInsightsList = new List<InsightsData>();
         if (user.Insights != null && user.Insights.Any())
         {
             foreach (var insightJson in user.Insights)
@@ -36,7 +38,7 @@ public class InsightsController : Controller
                     var insight = JsonConvert.DeserializeObject<InsightsData>(insightJson);
                     if (insight != null)
                     {
-                        insightsList.Add(insight);
+                        allInsightsList.Add(insight);
                     }
                 }
                 catch (JsonException ex)
@@ -47,8 +49,39 @@ public class InsightsController : Controller
             }
         }
 
-        // Pass the list of insights to the view
-        ViewBag.InsightsDataList = insightsList;
+        // Sort insights by date/time (assuming you have a timestamp field)
+        // If you don't have a timestamp, you might want to add one or sort by creation order
+        allInsightsList = allInsightsList.OrderByDescending(x => x.CreatedAt ?? DateTime.Now).ToList();
+
+        // Calculate pagination
+        var totalInsights = allInsightsList.Count;
+        var totalPages = (int)Math.Ceiling((double)totalInsights / PageSize);
+
+        // Ensure page is within valid range
+        page = Math.Max(1, Math.Min(page, totalPages));
+
+        // Get insights for current page
+        var pagedInsights = allInsightsList
+            .Skip((page - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
+
+        // Create pagination info
+        var paginationInfo = new PaginationInfo
+        {
+            CurrentPage = page,
+            TotalPages = totalPages,
+            TotalItems = totalInsights,
+            PageSize = PageSize,
+            HasPreviousPage = page > 1,
+            HasNextPage = page < totalPages
+        };
+
+        // Pass data to view
+        ViewBag.InsightsDataList = pagedInsights;
+        ViewBag.PaginationInfo = paginationInfo;
+        ViewBag.Email = email;
+
         return View("~/Views/Home/Insights.cshtml", user);
     }
 
@@ -65,33 +98,25 @@ public class InsightsController : Controller
         // 2. Analyze CSV content
         var insights = await _aiAnalysisService.CsvAnalyzer(csvContent);
 
-        // 3. Update insights
+        // 3. Add timestamp to insights
+        insights.CreatedAt = DateTime.Now;
+
+        // 4. Update insights
         user.Insights.Add(JsonConvert.SerializeObject(insights));
         await _userService.UpdateUserAsync(user);
 
-        // 4. Rebuild the full list of insights
-        var insightsList = new List<InsightsData>();
-        if (user.Insights != null && user.Insights.Any())
-        {
-            foreach (var insightJson in user.Insights)
-            {
-                try
-                {
-                    var insight = JsonConvert.DeserializeObject<InsightsData>(insightJson);
-                    if (insight != null)
-                    {
-                        insightsList.Add(insight);
-                    }
-                }
-                catch (JsonException ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Failed to deserialize insight: {ex.Message}");
-                }
-            }
-        }
-
-        // 5. Pass the updated list of insights to the view
-        ViewBag.InsightsDataList = insightsList;
-        return View("~/Views/Home/Insights.cshtml", user);
+        // 5. Redirect to first page to show new insights
+        return RedirectToAction("Index", new { email = email, page = 1 });
     }
+}
+
+// Add this class to your Models folder or wherever you keep your models
+public class PaginationInfo
+{
+    public int CurrentPage { get; set; }
+    public int TotalPages { get; set; }
+    public int TotalItems { get; set; }
+    public int PageSize { get; set; }
+    public bool HasPreviousPage { get; set; }
+    public bool HasNextPage { get; set; }
 }

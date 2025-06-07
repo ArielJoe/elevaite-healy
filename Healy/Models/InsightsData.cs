@@ -10,6 +10,8 @@ namespace Healy.Models
         public InsightCategory? Steps { get; set; }
         public InsightCategory? Calories { get; set; }
         public InsightCategory? Stress { get; set; }
+
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
     }
 
     public class InsightCategory
