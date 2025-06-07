@@ -1,5 +1,9 @@
-﻿@{
+﻿@model Healy.Models.User
+@using Healy.Models
+
+@{
     ViewData["Title"] = "Insights";
+    var insightsList = ViewBag.InsightsDataList as List<InsightsData> ?? new List<InsightsData>();
 }
 
 @section Styles {
@@ -11,123 +15,189 @@
             margin-bottom: 20px;
             background-color: #fff;
         }
-        .insight-card h5 {
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-        .insight-card p {
-            margin-bottom: 5px;
-            color: #666;
-        }
-        .insight-card .recommendation {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
+
+            .insight-card h5 {
+                margin-bottom: 10px;
+                font-size: 1.1rem;
+            }
+
+            .insight-card p {
+                margin-bottom: 5px;
+                color: #666;
+            }
+
+            .insight-card .recommendation {
+                background-color: #f8f9fa;
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+
         .insight-icon {
             font-size: 1.5rem;
             margin-right: 10px;
         }
-        .blue-card { border-left: 5px solid #007bff; }
-        .green-card { border-left: 5px solid #28a745; }
-        .red-card { border-left: 5px solid #dc3545; }
-        .summary-card {
+
+        .blue-card {
+            border-left: 5px solid #007bff;
+        }
+
+        .green-card {
+            border-left: 5px solid #28a745;
+        }
+
+        .red-card {
+            border-left: 5px solid #dc3545;
+        }
+
+        .purple-card {
+            border-left: 5px solid #6f42c1;
+        }
+
+        .orange-card {
+            border-left: 5px solid #fd7e14;
+        }
+
+        .cyan-card {
             border-left: 5px solid #17a2b8;
         }
-        .change-box {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-        .positive { background-color: #d4edda; color: #155724; }
-        .negative { background-color: #f8d7da; color: #721c24; }
-        .neutral { background-color: #cce5ff; color: #004085; }
     </style>
 }
 
-<div class="container" style="">
+<div class="container mt-4">
     <h2>AI Insights</h2>
     <p class="text-muted">Your personalized health intelligence</p>
     <hr />
 
-    @if (ViewBag.InsightsData != null)
+    @if (insightsList.Any())
     {
-        var data = ViewBag.InsightsData;
-
-        <!-- Sleep Quality -->
-        <div class="insight-card blue-card">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-moon insight-icon"></i>
-                <div>
-                    <h5>@data.SleepQuality.Title <small class="text-muted">@data.SleepQuality.Time</small></h5>
-                    <p>@data.SleepQuality.Description</p>
-                    <div class="recommendation">
-                        <strong>RECOMMENDATION:</strong> @data.SleepQuality.Recommendation
+        @foreach (var data in insightsList)
+        {
+            <!-- Heart Rate -->
+            @if (data.HeartRate != null)
+            {
+                <div class="insight-card red-card">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-heart-pulse insight-icon"></i>
+                        <div>
+                            <h5>@data.HeartRate.Title <small class="text-muted">@data.HeartRate.Time</small></h5>
+                            <p>@data.HeartRate.Description</p>
+                            <div class="recommendation">
+                                <strong>RECOMMENDATION:</strong> @data.HeartRate.Recommendation
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            }
 
-        <!-- Activity Pattern -->
-        <div class="insight-card blue-card">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-activity insight-icon"></i>
-                <div>
-                    <h5>@data.ActivityPattern.Title <small class="text-muted">@data.ActivityPattern.Time</small></h5>
-                    <p>@data.ActivityPattern.Description</p>
-                    <div class="recommendation">
-                        <strong>RECOMMENDATION:</strong> @data.ActivityPattern.Recommendation
+            <!-- Sleep -->
+            @if (data.Sleep != null)
+            {
+                <div class="insight-card blue-card">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-moon insight-icon"></i>
+                        <div>
+                            <h5>@data.Sleep.Title <small class="text-muted">@data.Sleep.Time</small></h5>
+                            <p>@data.Sleep.Description</p>
+                            <div class="recommendation">
+                                <strong>RECOMMENDATION:</strong> @data.Sleep.Recommendation
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            }
 
-        <!-- Hydration Improvement -->
-        <div class="insight-card green-card">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-droplet insight-icon"></i>
-                <div>
-                    <h5>@data.HydrationImprovement.Title <small class="text-muted">@data.HydrationImprovement.Time</small></h5>
-                    <p>@data.HydrationImprovement.Description</p>
-                    <div class="recommendation">
-                        <strong>RECOMMENDATION:</strong> @data.HydrationImprovement.Recommendation
+            <!-- Blood O2 -->
+            @if (data.BloodO2 != null)
+            {
+                <div class="insight-card green-card">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-lungs insight-icon"></i>
+                        <div>
+                            <h5>@data.BloodO2.Title <small class="text-muted">@data.BloodO2.Time</small></h5>
+                            <p>@data.BloodO2.Description</p>
+                            <div class="recommendation">
+                                <strong>RECOMMENDATION:</strong> @data.BloodO2.Recommendation
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            }
 
-        <!-- Elevated Stress Levels -->
-        <div class="insight-card red-card">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-exclamation-triangle insight-icon"></i>
-                <div>
-                    <h5>@data.StressLevels.Title <small class="text-muted">@data.StressLevels.Time</small></h5>
-                    <p>@data.StressLevels.Description</p>
-                    <div class="recommendation">
-                        <strong>RECOMMENDATION:</strong> @data.StressLevels.Recommendation
+            <!-- Steps -->
+            @if (data.Steps != null)
+            {
+                <div class="insight-card orange-card">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-shoe-prints insight-icon"></i>
+                        <div>
+                            <h5>@data.Steps.Title <small class="text-muted">@data.Steps.Time</small></h5>
+                            <p>@data.Steps.Description</p>
+                            <div class="recommendation">
+                                <strong>RECOMMENDATION:</strong> @data.Steps.Recommendation
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            }
 
-        <!-- Weekly Health Summary -->
-        <div class="insight-card summary-card">
-            <div>
-                <h5>@data.WeeklySummary.Title</h5>
-                <p>@data.WeeklySummary.Description</p>
-                <div class="d-flex flex-wrap mt-3">
-                    @foreach (var change in data.WeeklySummary.Changes)
-                    {
-                        <span class="change-box @(change.Change.Contains("+") ? "positive" : change.Change.Contains("-") ? "negative" : "neutral")">@change.Change (@change.Category)</span>
-                    }
+            <!-- Calories -->
+            @if (data.Calories != null)
+            {
+                <div class="insight-card purple-card">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-fire insight-icon"></i>
+                        <div>
+                            <h5>@data.Calories.Title <small class="text-muted">@data.Calories.Time</small></h5>
+                            <p>@data.Calories.Description</p>
+                            <div class="recommendation">
+                                <strong>RECOMMENDATION:</strong> @data.Calories.Recommendation
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            }
+
+            <!-- Stress -->
+            @if (data.Stress != null)
+            {
+                <div class="insight-card cyan-card">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle insight-icon"></i>
+                        <div>
+                            <h5>@data.Stress.Title <small class="text-muted">@data.Stress.Time</small></h5>
+                            <p>@data.Stress.Description</p>
+                            <div class="recommendation">
+                                <strong>RECOMMENDATION:</strong> @data.Stress.Recommendation
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+        <!-- Show message if no insights were generated -->
+        @if (!insightsList.Any() || insightsList.All(data => data.HeartRate == null && data.Sleep == null && data.BloodO2 == null && data.Steps == null && data.Calories == null && data.Stress == null))
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i>
+                No specific insights were generated from your data. Try generating insights again or check your wearable data.
             </div>
-        </div>
+        }
     }
     else
     {
-        <p>No insights data available.</p>
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i>
+            No insights data available. Click the button below to generate personalized insights from your wearable data.
+        </div>
     }
+
+    <form method="post" asp-action="GenerateInsights">
+        <input type="hidden" name="email" value="@Model.Email" />
+        <button type="submit" class="btn btn-primary mt-3">
+            <i class="bi bi-brain"></i>
+            Generate AI Insights
+        </button>
+    </form>
 </div>

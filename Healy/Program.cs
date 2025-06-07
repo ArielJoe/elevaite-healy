@@ -1,8 +1,10 @@
 using Azure;
 using Azure.AI.OpenAI;
+using Healy.Models;
+using Healy.Services;
+using Microsoft.Azure.Cosmos;
 using OpenAI.Chat;
 using Serilog;
-using Healy.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,7 @@ builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddSingleton<Healy.Services.BlobService>();
 
 builder.Services.Configure<AzureOpenAIModel>(builder.Configuration.GetSection("AzureOpenAI"));
@@ -35,7 +38,34 @@ builder.Services.AddSingleton<ChatClient>(sp =>
     return azureClient.GetChatClient(config.DeploymentName!);
 });
 
+builder.Services.AddSingleton<CosmosClient>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var endpointUri = configuration["CosmosDb:EndpointUri"];
+    var primaryKey = configuration["CosmosDb:PrimaryKey"];
+    return new CosmosClient(endpointUri, primaryKey, new CosmosClientOptions
+    {
+        ApplicationName = "Healy"
+    });
+});
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddScoped<IAiAnalysisService, AiAnalysisService>();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 var app = builder.Build();
+
+app.UseSession();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -56,12 +86,22 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "insights-shortcut",
     pattern: "Insights",
-    defaults: new { controller = "Home", action = "Insights" });
+    defaults: new { controller = "Insights", action = "Index" });
 
 app.MapControllerRoute(
     name: "activities-shortcut",
     pattern: "Activities",
     defaults: new { controller = "Home", action = "Activities" });
+
+app.MapControllerRoute(
+    name: "login-shortcut",
+    pattern: "Login",
+    defaults: new { controller = "Home", action = "Login" });
+
+app.MapControllerRoute(
+    name: "register-shortcut",
+    pattern: "Register",
+    defaults: new { controller = "Home", action = "Register" });
 
 app.MapControllerRoute(
     name: "default",
