@@ -52,7 +52,8 @@ builder.Services.AddSingleton<CosmosClient>(sp =>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-builder.Services.AddScoped<IAiAnalysisService, AiAnalysisService>();
+builder.Services.AddSingleton<IAiAnalysisService<InsightsData>, AIInsightsAnalysisService>();
+builder.Services.AddSingleton<IAiAnalysisService<ActivitiesData>, AIActivitiesAnalysisService>();
 
 builder.Services.AddSession(options =>
 {
@@ -91,7 +92,7 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "activities-shortcut",
     pattern: "Activities",
-    defaults: new { controller = "Home", action = "Activities" });
+    defaults: new { controller = "Activities", action = "Index" });
 
 app.MapControllerRoute(
     name: "login-shortcut",

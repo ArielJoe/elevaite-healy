@@ -1,7 +1,9 @@
-﻿using Healy.Models;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-public interface IAiAnalysisService
+namespace Healy.Services
 {
-    Task<InsightsData> CsvAnalyzer(string csvContent);
+    public interface IAiAnalysisService<T>
+    {
+        Task<T> CsvAnalyzer(string csvContent);
+    }
 }

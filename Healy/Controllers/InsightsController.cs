@@ -9,10 +9,10 @@ using System.Linq;
 public class InsightsController : Controller
 {
     private readonly IUserService _userService;
-    private readonly IAiAnalysisService _aiAnalysisService;
+    private readonly IAiAnalysisService<InsightsData> _aiAnalysisService;
     private const int PageSize = 5; // Number of insights per page
 
-    public InsightsController(IUserService userService, IAiAnalysisService aiAnalysisService)
+    public InsightsController(IUserService userService, IAiAnalysisService<InsightsData> aiAnalysisService)
     {
         _userService = userService;
         _aiAnalysisService = aiAnalysisService;
@@ -108,15 +108,4 @@ public class InsightsController : Controller
         // 5. Redirect to first page to show new insights
         return RedirectToAction("Index", new { email = email, page = 1 });
     }
-}
-
-// Add this class to your Models folder or wherever you keep your models
-public class PaginationInfo
-{
-    public int CurrentPage { get; set; }
-    public int TotalPages { get; set; }
-    public int TotalItems { get; set; }
-    public int PageSize { get; set; }
-    public bool HasPreviousPage { get; set; }
-    public bool HasNextPage { get; set; }
 }

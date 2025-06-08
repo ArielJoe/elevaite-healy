@@ -1,6 +1,237 @@
-﻿@{
-    ViewData["Title"] = "Activities";
-}
-<h1>@ViewData["Title"]</h1>
+﻿@model Healy.Models.User
+@using Healy.Models
+@using Newtonsoft.Json
 
-<p>Activities</p>
+@{
+    ViewData["Title"] = "Activities";
+    var email = ViewBag.Email as string ?? Model?.Email ?? string.Empty;
+
+    // Deserialize activities from JSON strings
+    var activitiesList = new List<ActivitiesData>();
+    if (Model?.Activities != null)
+    {
+        foreach (var activityJson in Model.Activities)
+        {
+            try
+            {
+                var activityData = JsonConvert.DeserializeObject<ActivitiesData>(activityJson,
+                    new JsonSerializerSettings
+                    {
+                        MissingMemberHandling = MissingMemberHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+
+                if (activityData != null)
+                {
+                    activitiesList.Add(activityData);
+                }
+            }
+            catch (Exception ex)
+            {
+                <div class="alert alert-danger">Error parsing activity: @ex.Message</div>
+            }
+        }
+    }
+
+    var hasActivities = activitiesList.Any(data =>
+        data?.Walking != null ||
+        data?.Breathing != null ||
+        data?.WeightLifting != null);
+}
+
+@section Styles {
+    <style>
+        .activity-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+
+            .activity-card h5 {
+                margin-bottom: 10px;
+                font-size: 1.1rem;
+            }
+
+            .activity-card p {
+                margin-bottom: 5px;
+                color: #666;
+            }
+
+            .activity-card .recommendation {
+                background-color: #f8f9fa;
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+
+        .activity-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .blue-card {
+            border-left: 5px solid #007bff;
+        }
+
+        .green-card {
+            border-left: 5px solid #28a745;
+        }
+
+        .purple-card {
+            border-left: 5px solid #6f42c1;
+        }
+
+        .orange-card {
+            border-left: 5px solid #fd7e14;
+        }
+
+        /* Loading Spinner Styles */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            display: inline-block;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-container {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+            .loading-container.active {
+                display: flex;
+            }
+
+        .activities-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .activities-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            const loadingContainer = document.querySelector('.loading-container');
+
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    loadingContainer.classList.add('active');
+                });
+            }
+        });
+    </script>
+}
+
+<div class="container mt-4">
+    <div class="activities-header">
+        <div>
+            <h2>AI Activity Recommendations</h2>
+            <p class="text-muted">Your personalized activity suggestions</p>
+        </div>
+    </div>
+    <hr />
+
+    @if (hasActivities)
+    {
+        @foreach (var data in activitiesList)
+        {
+            <!-- Walking -->
+            @if (data?.Walking != null)
+            {
+                <div class="activity-card blue-card">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-person-walking activity-icon"></i>
+                        <div>
+                            <h5>@data.Walking.Title <small class="text-muted">@data.Walking.Time</small></h5>
+                            <p>@data.Walking.Description</p>
+                            <div class="recommendation">
+                                <strong>RECOMMENDATION:</strong> @data.Walking.Recommendation
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Breathing -->
+            @if (data?.Breathing != null)
+            {
+                <div class="activity-card green-card">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-lungs-fill activity-icon"></i>
+                        <div>
+                            <h5>@data.Breathing.Title <small class="text-muted">@data.Breathing.Time</small></h5>
+                            <p>@data.Breathing.Description</p>
+                            <div class="recommendation">
+                                <strong>RECOMMENDATION:</strong> @data.Breathing.Recommendation
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- WeightLifting -->
+            @if (data?.WeightLifting != null)
+            {
+                <div class="activity-card purple-card">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-activity activity-icon"></i>
+                        <div>
+                            <h5>@data.WeightLifting.Title <small class="text-muted">@data.WeightLifting.Time</small></h5>
+                            <p>@data.WeightLifting.Description</p>
+                            <div class="recommendation">
+                                <strong>RECOMMENDATION:</strong> @data.WeightLifting.Recommendation
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i>
+            No activity recommendations available. Click the button below to generate personalized activity suggestions from your wearable data.
+        </div>
+    }
+
+    <div class="loading-container" role="status">
+        <span>Generating activities...</span>
+        <div class="loader"></div>
+    </div>
+
+    <form method="post" asp-controller="Activities" asp-action="GenerateActivities">
+        <input type="hidden" name="email" value="@email" />
+        <button type="submit" class="btn btn-primary mt-3">
+            <i class="bi bi-lightning"></i>
+            Generate AI Activities
+        </button>
+    </form>
+</div>

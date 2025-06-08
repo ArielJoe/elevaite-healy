@@ -48,5 +48,9 @@ namespace Healy.Models
         [JsonProperty("insights")]
         [JsonPropertyName("insights")]
         public List<string> Insights { get; set; } = new List<string>();
+
+        [JsonProperty("activities")]
+        [JsonPropertyName("activities")]
+        public List<string> Activities { get; set; } = new List<string>();
     }
 }

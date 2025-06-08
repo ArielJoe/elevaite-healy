@@ -1,16 +1,17 @@
 ﻿using Azure.AI.OpenAI;
 using Healy.Models;
+using Healy.Services;
 using OpenAI.Chat;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-public class AiAnalysisService : IAiAnalysisService
+public class AIInsightsAnalysisService : IAiAnalysisService<InsightsData>
 {
     private readonly ChatClient _chatClient;
 
-    public AiAnalysisService(ChatClient chatClient)
+    public AIInsightsAnalysisService(ChatClient chatClient)
     {
         _chatClient = chatClient;
     }
