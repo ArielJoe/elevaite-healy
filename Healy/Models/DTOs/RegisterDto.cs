@@ -40,5 +40,9 @@ namespace Healy.Models.DTOs
         [Range(1, 300, ErrorMessage = "Height must be between 1 and 300 cm")]
         [Display(Name = "Height (cm)")]
         public int Height { get; set; }
+
+        [Required(ErrorMessage = "Gender is required")]
+        [Display(Name = "Gender")]
+        public string Gender { get; set; }
     }
 }

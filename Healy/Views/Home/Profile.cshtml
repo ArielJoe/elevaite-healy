@@ -1,19 +1,33 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContext
+
+@{
     ViewData["Title"] = "Profile";
+    var session = HttpContext.HttpContext!.Session;
+
+    var username = session.GetString("Username") ?? "N/A";
+    var gender = session.GetString("Gender") ?? "Unknown";
+    var birthdateStr = session.GetString("Birthdate");
+    var weight = session.GetInt32("Weight") ?? 0;
+    var height = session.GetInt32("Height") ?? 0;
+
+    var age = 0;
+    if (DateTime.TryParse(birthdateStr, out var birthdate))
+    {
+        var today = DateTime.Today;
+        age = today.Year - birthdate.Year;
+        if (birthdate.Date > today.AddYears(-age)) age--;
+    }
+
+    // BMI calculation
+    var heightMeters = height / 100.0;
+    var bmiValue = heightMeters > 0 ? weight / (heightMeters * heightMeters) : 0;
+    var bmi = bmiValue.ToString("0.0");
 }
 
 <div class="container py-4">
     <!-- Profile Section -->
     <div class="text-center mb-5 bg-primary bg-gradient text-white rounded-4 p-4 shadow-sm" style="background: linear-gradient(135deg, #3498db, #2980b9);">
-        <div class="position-relative">
-            @* <div class="position-absolute top-0 end-0">
-                <button class="btn btn-light btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile">
-                    <i class="bi bi-pencil-fill text-primary"></i>
-                </button>
-            </div> *@
-        </div>
-
-        <!-- Perfect Circle Avatar with Icon Background -->
         <div class="d-flex justify-content-center mb-3">
             <div class="rounded-circle d-flex align-items-center justify-content-center"
                  style="width: 100px; height: 100px; background-color: rgba(255,255,255,0.2);">
@@ -23,22 +37,22 @@
 
         <div class="d-flex justify-content-center gap-5 mb-4">
             <div class="text-center">
-                <div class="fs-3 fw-bold">73</div>
+                <div class="fs-3 fw-bold">@weight</div>
                 <div class="text-white opacity-75"><i class="bi bi-speedometer2 me-2"></i>kg</div>
             </div>
             <div class="text-center">
-                <div class="fs-3 fw-bold">178</div>
+                <div class="fs-3 fw-bold">@height</div>
                 <div class="text-white opacity-75"><i class="bi bi-rulers me-2"></i>cm</div>
             </div>
             <div class="text-center">
-                <div class="fs-3 fw-bold">23</div>
-                <div class="text-white opacity-75"><i class="bi bi-graph-up me-2"></i>bmi</div>
+                <div class="fs-3 fw-bold">@bmi</div>
+                <div class="text-white opacity-75"><i class="bi bi-graph-up me-2"></i>BMI</div>
             </div>
         </div>
 
-        <h3 class="fw-bold mb-1">Alex Johnson</h3>
+        <h3 class="fw-bold mb-1">@username</h3>
         <p class="text-white opacity-75 mb-4">
-            <i class="bi bi-calendar3 me-1"></i> 32 • <i class="bi bi-gender-male me-1"></i> Male
+            <i class="bi bi-calendar3 me-1"></i> @age • <i class="bi bi-gender-@gender.ToLower() me-1"></i> @gender
         </p>
 
         <button class="btn btn-light text-primary px-4 rounded-pill fw-medium">
@@ -96,7 +110,7 @@
                     </div>
                     <div class="text-end">
                         <span class="badge bg-primary bg-opacity-10 text-primary">In progress</span>
-                        <p class="fs-5 fw-bold mb-0">73</p>
+                        <p class="fs-5 fw-bold mb-0">@weight</p>
                         <small class="text-muted">Current</small>
                     </div>
                 </div>
@@ -110,20 +124,6 @@
 
     <!-- Settings Section -->
     <div class="list-group rounded-3 shadow-sm">
-        @* <a href="#" class="list-group-item list-group-item-action border-0 py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="fw-medium"><i class="bi bi-person me-2"></i>Account Settings</span>
-                <i class="bi bi-chevron-right text-muted"></i>
-            </div>
-        </a> *@
-
-        @* <a href="#" class="list-group-item list-group-item-action border-0 py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="fw-medium"><i class="bi bi-shield-lock me-2"></i>Privacy & Security</span>
-                <i class="bi bi-chevron-right text-muted"></i>
-            </div>
-        </a> *@
-
         <a href="#" class="list-group-item list-group-item-action border-0 py-3">
             <div class="d-flex justify-content-between align-items-center">
                 <span class="fw-medium"><i class="bi bi-bell me-2"></i>Notifications</span>
@@ -131,7 +131,7 @@
             </div>
         </a>
 
-        <a href="#" class="list-group-item list-group-item-action border-0 py-3 text-danger">
+        <a href="/Auth/Logout" class="list-group-item list-group-item-action border-0 py-3 text-danger">
             <div class="d-flex justify-content-between align-items-center">
                 <span class="fw-medium"><i class="bi bi-box-arrow-right me-2"></i>Log Out</span>
                 <i class="bi bi-chevron-right text-danger"></i>
@@ -140,7 +140,7 @@
     </div>
 </div>
 
-<!-- Goals Modal (hidden by default) -->
+<!-- Goals Modal -->
 <div class="modal fade" id="goalsModal" tabindex="-1" aria-labelledby="goalsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

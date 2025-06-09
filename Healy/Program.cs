@@ -55,9 +55,11 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IAiAnalysisService<InsightsData>, AIInsightsAnalysisService>();
 builder.Services.AddSingleton<IAiAnalysisService<ActivitiesData>, AIActivitiesAnalysisService>();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.IdleTimeout = TimeSpan.FromHours(1);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });

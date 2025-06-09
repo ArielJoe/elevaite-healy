@@ -20,7 +20,7 @@ public class ActivitiesController : Controller
 
     public async Task<IActionResult> Index(string email, int page = 1)
     {
-        var user = await _userService.GetUserByEmailAsync(email ?? "ariel.crb01@gmail.com");
+        var user = await _userService.GetUserByEmailAsync(HttpContext.Session.GetString("Email")!);
         if (user == null)
         {
             System.Diagnostics.Debug.WriteLine("User not found for email: " + email);
@@ -110,7 +110,7 @@ public class ActivitiesController : Controller
     [HttpPost]
     public async Task<IActionResult> GenerateActivities(string email)
     {
-        var user = await _userService.GetUserByEmailAsync("ariel.crb01@gmail.com");
+        var user = await _userService.GetUserByEmailAsync(HttpContext.Session.GetString("Email")!);
         if (user == null || string.IsNullOrEmpty(user.WearableData))
             return NotFound("User or wearable data not found.");
 

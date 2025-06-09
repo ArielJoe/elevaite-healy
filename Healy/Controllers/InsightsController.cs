@@ -21,7 +21,7 @@ public class InsightsController : Controller
     // GET: /Insights
     public async Task<IActionResult> Index(string email, int page = 1)
     {
-        var user = await _userService.GetUserByEmailAsync("ariel.crb01@gmail.com");
+        var user = await _userService.GetUserByEmailAsync(HttpContext.Session.GetString("Email")!);
         if (user == null)
         {
             return NotFound("User not found.");

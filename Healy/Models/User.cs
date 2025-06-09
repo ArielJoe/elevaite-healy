@@ -41,6 +41,10 @@ namespace Healy.Models
         [Range(1, 300)]
         public int Height { get; set; }
 
+        [JsonProperty("gender")]
+        [JsonPropertyName("gender")]
+        public string? Gender { get; set; }
+
         [JsonProperty("wearable_data")]
         [JsonPropertyName("wearable_data")]
         public string WearableData { get; set; } = string.Empty;

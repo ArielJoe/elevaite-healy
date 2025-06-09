@@ -4,6 +4,7 @@ using Healy.Models;
 using Healy.Models.DTOs;
 using Healy.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System;
@@ -232,6 +233,10 @@ namespace Healy.Controllers
             HttpContext.Session.SetString("UserId", user.Id);
             HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("Email", user.Email);
+            HttpContext.Session.SetInt32("Weight", user.Weight);
+            HttpContext.Session.SetInt32("Height", user.Height);
+            HttpContext.Session.SetString("Birthdate", user.Birthdate.ToString("yyyy-MM-dd"));
+            HttpContext.Session.SetString("Gender", user.Gender!);
 
             _logger.LogInformation("User logged in successfully: {Email}", user.Email);
             return RedirectToAction("Index", "Home");
@@ -254,6 +259,7 @@ namespace Healy.Controllers
                 _logger.LogWarning("Unauthorized access to Profile page");
                 return RedirectToAction("Login", "Home");
             }
+
             return View();
         }
 

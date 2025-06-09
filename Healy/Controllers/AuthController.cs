@@ -31,7 +31,7 @@ namespace Healy.Controllers
                 return View(loginDto);
 
             var user = await _authService.EmailExistsAsync(loginDto.Email)
-                ? await GetUserByEmail(loginDto.Email)
+                ? await _authService.GetUserByEmailAsync(loginDto.Email)
                 : null;
 
             if (user == null || !_authService.VerifyPassword(loginDto.Password, user.PasswordHash))
@@ -40,10 +40,23 @@ namespace Healy.Controllers
                 return View(loginDto);
             }
 
-            // TODO: Add session or authentication logic here
-            // e.g., HttpContext.Session.SetString("UserId", user.Id);
+            //HttpContext.Session.SetString("UserId", "0001");
+            //HttpContext.Session.SetString("Username", "ArielJoe");
+            //HttpContext.Session.SetString("Email", "durensaospadang@gmail.com");
+            //HttpContext.Session.SetInt32("Weight", 80);
+            //HttpContext.Session.SetInt32("Height", 179);
+            //HttpContext.Session.SetString("Birthdate", "2005-04-28");
+            //HttpContext.Session.SetString("Gender", "Male");
 
-            return RedirectToAction("Index", "Home"); // Redirect after successful login
+            //HttpContext.Session.SetString("UserId", user.Id);
+            //HttpContext.Session.SetString("Username", user.Username);
+            //HttpContext.Session.SetString("Email", user.Email);
+            //HttpContext.Session.SetInt32("Weight", user.Weight);
+            //HttpContext.Session.SetInt32("Height", user.Height);
+            //HttpContext.Session.SetString("Birthdate", user.Birthdate.ToString("yyyy-MM-dd"));
+            //HttpContext.Session.SetString("Gender", user.Gender!);
+
+            return RedirectToAction("Index", "Home");
         }
 
         // POST: /Auth/Register
@@ -51,14 +64,10 @@ namespace Healy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
-            if (await _authService.EmailExistsAsync(registerDto.Email))
+            _logger.LogInformation("Register request received");
+
+            if (!ModelState.IsValid)
             {
-                throw new InvalidOperationException("User with this email already exists");
-            }
-
-            _logger.LogInformation("Register");
-
-            if (!ModelState.IsValid) {
                 return View(registerDto);
             }
 
@@ -74,34 +83,46 @@ namespace Healy.Controllers
                 return View(registerDto);
             }
 
-            var user = await _authService.RegisterAsync(registerDto);
-
-            // Optional: Automatically log in user after registration
+            try
+            {
+                var user = await _authService.RegisterAsync(registerDto);
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(registerDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Registration failed");
+                ModelState.AddModelError(string.Empty, "An error occurred while registering your account.");
+                return View(registerDto);
+            }
 
             return RedirectToAction("Login");
         }
 
         // Helper method to retrieve user (replicates what AuthService does internally)
-        private async Task<Models.User> GetUserByEmail(string email)
-        {
-            var query = new Microsoft.Azure.Cosmos.QueryDefinition("SELECT * FROM c WHERE c.email = @email")
-                .WithParameter("@email", email);
+        //private async Task<Models.User> GetUserByEmail(string email)
+        //{
+        //    var query = new Microsoft.Azure.Cosmos.QueryDefinition("SELECT * FROM c WHERE c.email = @email")
+        //        .WithParameter("@email", email);
 
-            var container = ((AuthService)_authService).GetType()
-                .GetField("_container", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?
-                .GetValue(_authService) as Microsoft.Azure.Cosmos.Container;
+        //    var container = ((AuthService)_authService).GetType()
+        //        .GetField("_container", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?
+        //        .GetValue(_authService) as Microsoft.Azure.Cosmos.Container;
 
-            if (container == null)
-                return null!;
+        //    if (container == null)
+        //        return null!;
 
-            var iterator = container.GetItemQueryIterator<Models.User>(query);
-            while (iterator.HasMoreResults)
-            {
-                var response = await iterator.ReadNextAsync();
-                return response.FirstOrDefault()!;
-            }
+        //    var iterator = container.GetItemQueryIterator<Models.User>(query);
+        //    while (iterator.HasMoreResults)
+        //    {
+        //        var response = await iterator.ReadNextAsync();
+        //        return response.FirstOrDefault()!;
+        //    }
 
-            return null!;
-        }
+        //    return null!;
+        //}
     }
 }

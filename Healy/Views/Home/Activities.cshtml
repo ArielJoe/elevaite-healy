@@ -217,7 +217,7 @@
     else
     {
         <div class="alert alert-warning">
-            <i class="bi bi-exclamation-triangle"></i>
+            <i class="bi bi-exclamation-triangle"></i>&nbsp;
             No activity recommendations available. Click the button below to generate personalized activity suggestions from your wearable data.
         </div>
     }
@@ -230,7 +230,7 @@
     <form method="post" asp-controller="Activities" asp-action="GenerateActivities">
         <input type="hidden" name="email" value="@email" />
         <button type="submit" class="btn btn-primary mt-3">
-            <i class="bi bi-lightning"></i>
+            <i class="bi bi-activity"></i>&nbsp;
             Generate AI Activities
         </button>
     </form>

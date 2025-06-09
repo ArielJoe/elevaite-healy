@@ -58,6 +58,7 @@ namespace Healy.Services
                     Birthdate = registerDto.Birthdate,
                     Weight = registerDto.Weight,
                     Height = registerDto.Height,
+                    Gender = registerDto.Gender,
                     WearableData = string.Empty,
                     Insights = new List<string>(),
                     Activities = new List<string>()
@@ -71,12 +72,13 @@ namespace Healy.Services
                 _logger.LogInformation("Saving user to Cosmos DB with ID: {Id}", user.Id);
                 var response = await _container.CreateItemAsync(
                     user,
-                    new PartitionKey(user.Id)
+                    new PartitionKey(user.Email)
                 ).ConfigureAwait(false);
 
                 _logger.LogInformation("Successfully registered user with email: {Email}", user.Email);
                 return response.Resource;
             }
+            /*
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
             {
                 _logger.LogWarning("User registration conflict for email: {Email}", registerDto.Email);
@@ -92,6 +94,8 @@ namespace Healy.Services
                 _logger.LogWarning("Validation failed for user registration: {Message}", ex.Message);
                 throw new ArgumentException($"Validation failed: {ex.Message}", ex);
             }
+            */
+
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during registration for email: {Email}", registerDto.Email);
@@ -158,7 +162,7 @@ namespace Healy.Services
                 while (iterator.HasMoreResults)
                 {
                     var response = await iterator.ReadNextAsync();
-                    return response.FirstOrDefault();
+                    return response.FirstOrDefault()!;
                 }
 
                 return null;

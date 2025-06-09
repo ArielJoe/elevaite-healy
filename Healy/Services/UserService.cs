@@ -14,7 +14,7 @@ public class UserService : IUserService
         _container = cosmosClient.GetContainer(dbName, containerName);
     }
 
-    public async Task<Healy.Models.User?> GetUserByEmailAsync(string email)
+    public async Task<Healy.Models.User> GetUserByEmailAsync(string email)
     {
         var query = new QueryDefinition("SELECT * FROM c WHERE c.email = @email")
             .WithParameter("@email", email);
@@ -24,10 +24,10 @@ public class UserService : IUserService
         while (iterator.HasMoreResults)
         {
             var response = await iterator.ReadNextAsync();
-            return response.FirstOrDefault(); // Return the first matching user
+            return response.FirstOrDefault()!; // Return the first matching user
         }
 
-        return null;
+        return null!;
     }
 
     public async Task<string> DownloadCsvAsync(string csvUrl)
