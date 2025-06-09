@@ -33,7 +33,7 @@ namespace Healy.Controllers
             _authService = authService;
         }
 
-        public async Task<IActionResult> Index(string period = "daily")
+        public async Task<IActionResult> Index(string period = "weekly")
         {
             _logger.LogInformation("Index action started at {Timestamp}", DateTime.UtcNow);
 

@@ -25,6 +25,26 @@
     var bmi = bmiValue.ToString("0.0");
 }
 
+<style>
+    .no-border-focus {
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .no-border-focus:focus {
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .no-border-focus:active {
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+</style>
+
 <div class="container py-4">
     <!-- Profile Section -->
     <div class="text-center mb-5 bg-primary bg-gradient text-white rounded-4 p-4 shadow-sm" style="background: linear-gradient(135deg, #3498db, #2980b9);">
@@ -131,12 +151,15 @@
             </div>
         </a>
 
-        <a href="/Auth/Logout" class="list-group-item list-group-item-action border-0 py-3 text-danger">
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="fw-medium"><i class="bi bi-box-arrow-right me-2"></i>Log Out</span>
-                <i class="bi bi-chevron-right text-danger"></i>
-            </div>
-        </a>
+        <form asp-action="Logout" asp-controller="Home" method="post" class="list-group-item list-group-item-action border-0 py-3 text-danger">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn text-danger p-0 text-decoration-none w-100 text-start no-border-focus" style="outline: none !important; border: none !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-medium"><i class="bi bi-box-arrow-right me-2"></i>Log Out</span>
+                    <i class="bi bi-chevron-right text-danger"></i>
+                </div>
+            </button>
+        </form>
     </div>
 </div>
 
