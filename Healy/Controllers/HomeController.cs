@@ -1,12 +1,18 @@
 using CsvHelper;
 using CsvHelper.Configuration;
 using Healy.Models;
+using Healy.Models.DTOs;
 using Healy.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -17,11 +23,13 @@ namespace Healy.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly BlobService _blobService;
+        private readonly IAuthService _authService;
 
-        public HomeController(ILogger<HomeController> logger, BlobService blobService)
+        public HomeController(ILogger<HomeController> logger, BlobService blobService, IAuthService authService)
         {
             _logger = logger;
             _blobService = blobService;
+            _authService = authService;
         }
 
         public async Task<IActionResult> Index(string period = "daily")
@@ -44,7 +52,7 @@ namespace Healy.Controllers
                     records = csv.GetRecords<CsvRecordViewModel>().ToList();
                 }
 
-                var combinedViewModel = new CombinedHealthMetricViewModel(); // Uses constructor to initialize
+                var combinedViewModel = new CombinedHealthMetricViewModel();
 
                 if (records == null || !records.Any())
                 {
@@ -96,7 +104,7 @@ namespace Healy.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing Index action");
-                return View(new CombinedHealthMetricViewModel()); // Uses constructor to initialize
+                return View(new CombinedHealthMetricViewModel());
             }
         }
 
@@ -143,13 +151,121 @@ namespace Healy.Controllers
             return "";
         }
 
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterDto registerDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state for registration: {Errors}",
+                    string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
+                return View(registerDto);
+            }
+
+            try
+            {
+                var user = await _authService.RegisterAsync(registerDto);
+                _logger.LogInformation("User registered successfully: {Email}", user.Email);
+
+                // Optional: Auto-login after registration using session
+                HttpContext.Session.SetString("UserId", user.Id);
+                HttpContext.Session.SetString("Username", user.Username);
+                HttpContext.Session.SetString("Email", user.Email);
+
+                return RedirectToAction("Index", "Home");
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning("Registration failed: {Message}", ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(registerDto);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning("Validation error during registration: {Message}", ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(registerDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during registration for email: {Email}", registerDto.Email);
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred during registration.");
+                return View(registerDto);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginDto loginDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state for login: {Errors}",
+                    string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
+                return View(loginDto);
+            }
+
+            var user = await _authService.EmailExistsAsync(loginDto.Email)
+                ? await _authService.GetUserByEmailAsync(loginDto.Email)
+                : null;
+
+            if (user == null || !_authService.VerifyPassword(loginDto.Password, user.PasswordHash))
+            {
+                _logger.LogWarning("Invalid login attempt for email: {Email}", loginDto.Email);
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return View(loginDto);
+            }
+
+            // Store user data in session
+            HttpContext.Session.SetString("UserId", user.Id);
+            HttpContext.Session.SetString("Username", user.Username);
+            HttpContext.Session.SetString("Email", user.Email);
+
+            _logger.LogInformation("User logged in successfully: {Email}", user.Email);
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            _logger.LogInformation("User logged out");
+            return RedirectToAction("Login", "Home");
+        }
+
         public IActionResult Profile()
         {
+            // Optional: Check if user is logged in
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
+            {
+                _logger.LogWarning("Unauthorized access to Profile page");
+                return RedirectToAction("Login", "Home");
+            }
             return View();
         }
 
         public IActionResult Insights()
         {
+            // Optional: Check if user is logged in
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
+            {
+                _logger.LogWarning("Unauthorized access to Insights page");
+                return RedirectToAction("Login", "Home");
+            }
+
             ViewBag.InsightsData = new
             {
                 SleepQuality = new { Title = "Sleep Quality Declining", Time = "06:07 AM", Description = "Your deep sleep has decreased by 20% over the past week, which may affect your recovery and cognitive function.", Recommendation = "Try to maintain a consistent sleep schedule and avoid screens 1 hour before bedtime." },
@@ -163,16 +279,12 @@ namespace Healy.Controllers
 
         public IActionResult Activities()
         {
-            return View();
-        }
-
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        public IActionResult Register()
-        {
+            // Optional: Check if user is logged in
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
+            {
+                _logger.LogWarning("Unauthorized access to Activities page");
+                return RedirectToAction("Login", "Home");
+            }
             return View();
         }
 

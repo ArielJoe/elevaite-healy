@@ -46,18 +46,16 @@ namespace Healy.Controllers
             return RedirectToAction("Index", "Home"); // Redirect after successful login
         }
 
-        // GET: /Auth/Register
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
         // POST: /Auth/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
+            if (await _authService.EmailExistsAsync(registerDto.Email))
+            {
+                throw new InvalidOperationException("User with this email already exists");
+            }
+
             _logger.LogInformation("Register");
 
             if (!ModelState.IsValid) {

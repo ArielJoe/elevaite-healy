@@ -11,54 +11,135 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Healy</title>
 
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
     <style>
         :root {
+            --primary-gradient: linear-gradient(to bottom right, #55c0a9, #1d9ba1);
+            --button-gradient: linear-gradient(to right, #25a9b8, #157f91);
+            --button-hover: linear-gradient(to right, #1d8e9e, #10636e);
             --primary-color: #25a9b8;
-            --primary-hover: #1e8a97;
+            --primary-dark: #157f91;
         }
 
         body {
-            background-color: #f8f9fa;
+            background: var(--primary-gradient);
             display: flex;
+            align-items: center;
+            justify-content: center;
             min-height: 100vh;
-            flex-direction: column;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .register-container {
+            background-color: white;
+            /* border-radius: 20px; */
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .register-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
             justify-content: center;
         }
 
-        .card {
-            border: none;
+        .register-icon img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        h2 {
+            font-weight: 700;
+            text-align: center;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
             border-radius: 10px;
-            overflow: hidden;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ced4da;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
-
-        .card-header {
-            background-color: var(--primary-color);
-            border-bottom: none;
-            padding: 1.5rem;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-            .btn-primary:hover {
-                background-color: var(--primary-hover);
-                border-color: var(--primary-hover);
-            }
 
         .form-control:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.25rem rgba(37, 169, 184, 0.25);
+        }
+
+        .btn-gradient {
+            background: var(--button-gradient);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-gradient:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(21, 127, 145, 0.3);
+            color: white;
+        }
+
+        .btn-gradient:active {
+            transform: translateY(0);
+            color: white;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .form-footer a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .text-danger {
+            font-size: 0.85rem;
+        }
+
+        .form-check-label {
+            font-size: 0.9rem;
+            color: #495057;
         }
 
         .form-check-input:checked {
@@ -66,138 +147,176 @@
             border-color: var(--primary-color);
         }
 
-        a {
-            color: var(--primary-color);
-        }
-
-            a:hover {
-                color: var(--primary-hover);
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .register-container {
+                padding: 1.5rem;
+                /* border-radius: 15px; */
             }
 
-        .is-valid {
-            border-color: #28a745;
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .form-label, .form-control, .btn-gradient {
+                font-size: 0.95rem;
+            }
         }
 
-        .is-invalid {
-            border-color: #dc3545;
+        @@media (max-width: 576px) {
+            body {
+                padding: 15px;
+            }
+
+            .register-container {
+                padding: 1.25rem;
+                /* border-radius: 12px; */
+            }
+
+            .register-icon {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 1rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .form-control {
+                padding: 0.65rem 0.9rem;
+            }
+
+            .btn-gradient {
+                padding: 0.7rem;
+                font-size: 0.95rem;
+            }
+
+            .form-footer {
+                font-size: 0.9rem;
+            }
         }
 
-        .input-group-text {
-            background-color: #f8f9fa;
+        @@media (max-width: 400px) {
+            .register-container {
+                padding: 1.5rem;
+                margin: 0.5rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            .subtitle {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container py-3">
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8 col-xl-6">
-                <div class="card shadow-lg">
-                    <div class="card-header text-white text-center">
-                        <h3><i class="fas fa-user-plus me-2"></i> Join Healy</h3>
+    <div class="register-container">
+        <div class="register-icon">
+            <img src="~/images/logo.png" alt="Healy Logo" width="80" height="80">
+        </div>
+        <h2>Create Account</h2>
+        <p class="subtitle">Start your wellness journey with us</p>
+
+        <form asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="text-danger small mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control" placeholder="Enter your full name" />
+                <span asp-validation-for="Username" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" placeholder="Email Address" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" placeholder="Enter your password" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Birthdate" class="form-label"></label>
+                <input asp-for="Birthdate" type="date" class="form-control" />
+                <span asp-validation-for="Birthdate" class="text-danger small"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Weight" class="form-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Weight" type="number" class="form-control" placeholder="Weight" />
+                        <span class="input-group-text">kg</span>
                     </div>
-                    <div class="card-body p-4">
-                        <form asp-action="Register" method="post">
-                            @Html.AntiForgeryToken()
-                            <div asp-validation-summary="All" class="text-danger"></div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="Username" class="form-label fw-bold"></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-user text-muted"></i></span>
-                                        <input asp-for="Username" class="form-control py-2" placeholder="Choose a username" />
-                                    </div>
-                                    <span asp-validation-for="Username" class="text-danger small mt-1 d-block"></span>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="Email" class="form-label fw-bold"></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-envelope text-muted"></i></span>
-                                        <input asp-for="Email" class="form-control py-2" placeholder="Enter your email" />
-                                    </div>
-                                    <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="Password" class="form-label fw-bold"></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
-                                        <input asp-for="Password" class="form-control py-2" placeholder="Create a password" />
-                                    </div>
-                                    <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="ConfirmPassword" class="form-label fw-bold"></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
-                                        <input asp-for="ConfirmPassword" class="form-control py-2" placeholder="Confirm password" />
-                                    </div>
-                                    <span asp-validation-for="ConfirmPassword" class="text-danger small mt-1 d-block"></span>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="Birthdate" class="form-label fw-bold"></label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-calendar text-muted"></i></span>
-                                    <input asp-for="Birthdate" class="form-control py-2" type="date" />
-                                </div>
-                                <span asp-validation-for="Birthdate" class="text-danger small mt-1 d-block"></span>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="Weight" class="form-label fw-bold"></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-weight text-muted"></i></span>
-                                        <input asp-for="Weight" class="form-control py-2" placeholder="Enter weight" />
-                                        <span class="input-group-text bg-light">kg</span>
-                                    </div>
-                                    <span asp-validation-for="Weight" class="text-danger small mt-1 d-block"></span>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label asp-for="Height" class="form-label fw-bold"></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-ruler-vertical text-muted"></i></span>
-                                        <input asp-for="Height" class="form-control py-2" placeholder="Enter height" />
-                                        <span class="input-group-text bg-light">cm</span>
-                                    </div>
-                                    <span asp-validation-for="Height" class="text-danger small mt-1 d-block"></span>
-                                </div>
-                            </div>
-
-                            <div class="d-grid mb-3">
-                                <button type="submit" class="btn btn-primary py-2 fw-bold">
-                                    <i class="fas fa-user-plus me-2"></i> Create Account
-                                </button>
-                            </div>
-                        </form>
+                    <span asp-validation-for="Weight" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Height" class="form-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Height" type="number" class="form-control" placeholder="Height" />
+                        <span class="input-group-text">cm</span>
                     </div>
-                    <div class="card-footer text-center py-3 bg-light">
-                        <p class="mb-0">
-                            Already have an account?
-                            <a asp-action="Login" class="fw-bold text-decoration-none">Login here</a>
-                        </p>
-                    </div>
+                    <span asp-validation-for="Height" class="text-danger small"></span>
                 </div>
             </div>
+
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="termsCheck" required />
+                <label class="form-check-label" for="termsCheck">
+                    I agree to the <a href="#" style="color: var(--primary-color);">Terms and Conditions</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-gradient w-100 mb-3">Create Account</button>
+        </form>
+
+        <div class="form-footer">
+            <p class="mb-0">Already have an account? <a asp-action="Login">Sign in here</a></p>
         </div>
     </div>
 
-    <!-- Bootstrap Bundle with Popper -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Validation scripts -->
     <partial name="_ValidationScriptsPartial" />
 
     <script>
         $(document).ready(function () {
+            // Responsive adjustments
+            function adjustLayout() {
+                if ($(window).width() < 768) {
+                    // Mobile-specific adjustments
+                } else {
+                    // Desktop-specific adjustments
+                }
+            }
+
+            // Run on load and resize
+            adjustLayout();
+            $(window).resize(adjustLayout);
+
             // Email availability check
             $('#Email').on('blur', function () {
                 var email = $(this).val();
@@ -211,8 +330,6 @@
                             emailField.removeClass('is-invalid').addClass('is-valid');
                             emailField.next('.text-danger').text('');
                         }
-                    }).fail(function() {
-                        $('#Email').removeClass('is-valid is-invalid');
                     });
                 }
             });
@@ -230,16 +347,24 @@
                             usernameField.removeClass('is-invalid').addClass('is-valid');
                             usernameField.next('.text-danger').text('');
                         }
-                    }).fail(function() {
-                        $('#Username').removeClass('is-valid is-invalid');
                     });
                 }
             });
 
-            // Clear validation classes on focus
-            $('input').on('focus', function() {
+            // Clear validation states on focus
+            $('input').on('focus', function () {
                 $(this).removeClass('is-invalid is-valid');
             });
+
+            // Better date input handling for mobile
+            if (/Mobi/.test(navigator.userAgent)) {
+                $('input[type="date"]').attr('type', 'text')
+                    .on('focus', function() {
+                        $(this).attr('type', 'date');
+                        // Force the mobile date picker to open
+                        this.focus();
+                    });
+            }
         });
     </script>
 </body>

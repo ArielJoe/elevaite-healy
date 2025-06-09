@@ -5,6 +5,7 @@ namespace Healy.Services
 {
     public interface IAuthService
     {
+        Task<Healy.Models.User> GetUserByEmailAsync(string id);
         Task<User> RegisterAsync(RegisterDto registerDto);
         Task<bool> EmailExistsAsync(string email);
         Task<bool> UsernameExistsAsync(string username);

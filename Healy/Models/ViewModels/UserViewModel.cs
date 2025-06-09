@@ -35,5 +35,8 @@ namespace Healy.Models.ViewModels
 
         [Display(Name = "Insights")]
         public List<string> Insights { get; set; } = new List<string>();
+
+        [Display(Name = "Activities")]
+        public List<string> Activities { get; set; } = new List<string>();
     }
 }
