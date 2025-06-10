@@ -23,8 +23,10 @@ public class ActivitiesController : Controller
         var user = await _userService.GetUserByEmailAsync(HttpContext.Session.GetString("Email")!);
         if (user == null)
         {
-            System.Diagnostics.Debug.WriteLine("User not found for email: " + email);
-            return NotFound("User not found.");
+            return RedirectToAction("Index", "Login");
+
+            //System.Diagnostics.Debug.WriteLine("User not found for email: " + email);
+            //return NotFound("User not found.");
         }
 
         // Log the raw activities data

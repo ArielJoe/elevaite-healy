@@ -25,6 +25,7 @@ namespace Healy.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly BlobService _blobService;
         private readonly IAuthService _authService;
+        private readonly IUserService _userService;
 
         public HomeController(ILogger<HomeController> logger, BlobService blobService, IAuthService authService)
         {
@@ -35,6 +36,11 @@ namespace Healy.Controllers
 
         public async Task<IActionResult> Index(string period = "weekly")
         {
+            if (HttpContext.Session.GetString("Email") == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
             _logger.LogInformation("Index action started at {Timestamp}", DateTime.UtcNow);
 
             string blobFileName = "20250529_6804018672_MiFitness_hlth_center_fitness_data.csv";

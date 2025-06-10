@@ -39,9 +39,10 @@ namespace Healy.Services
   ""Recommendation"": """",
   ""Time"": """"
 }");
-            promptBuilder.AppendLine("The Category field must be exactly one of: Exercise, Nutrition, Mindfulness, or SleepHygiene");
             promptBuilder.AppendLine("Select the category you find most significant based on the data. Provide a clear, brief activity recommendation relevant to that category only.");
             promptBuilder.AppendLine("The time is in UNIX format, convert it to human format.");
+            promptBuilder.AppendLine("GIVE RECOMMENDATION THAT NOT BURDENSOME, JUST 2 TO 10 MINUTRES OF DAILY ACTIVITY.");
+            promptBuilder.AppendLine("Accumulate the informations first before making decisiion.");
             promptBuilder.AppendLine("Here is the CSV data:");
             promptBuilder.AppendLine(csvHalfContent);
 

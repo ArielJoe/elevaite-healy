@@ -24,7 +24,8 @@ public class InsightsController : Controller
         var user = await _userService.GetUserByEmailAsync(HttpContext.Session.GetString("Email")!);
         if (user == null)
         {
-            return NotFound("User not found.");
+            return RedirectToAction("Index", "Login");
+            //return NotFound("User not found.");
         }
 
         // Deserialize all insights from user.Insights
